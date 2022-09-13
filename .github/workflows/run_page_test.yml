@@ -1,0 +1,11 @@
+name: page_test
+on: push
+jobs:
+  page-test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: build & run docker
+        run: docker-compose up -d --build
+      - name: Access check
+        run: sleep 10 && curl http://localhost:19250 -o /dev/null -w '%{http_code}\n' -s

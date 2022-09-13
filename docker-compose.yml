@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  LINE-API-front:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: line-api-frontend
+    container_name: LINE-API-frontend
+    restart: always
+    ports:
+      - 19250:19250
+    volumes:
+      - ./app/nuxt.config.js:/app/nuxt.config.js
+      - ./app/pages:/app/pages
+
