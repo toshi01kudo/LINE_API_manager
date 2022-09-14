@@ -3,7 +3,7 @@ version: "3.8"
 services:
   LINE-API-front:
     build:
-      context: .
+      context: ./frontend
       dockerfile: ./Dockerfile
     image: line-api-frontend
     container_name: LINE-API-frontend
@@ -11,6 +11,47 @@ services:
     ports:
       - 19250:19250
     volumes:
-      - ./app/nuxt.config.js:/app/nuxt.config.js
-      - ./app/pages:/app/pages
+      - ./frontend/app/nuxt.config.js:/app/nuxt.config.js
+      - ./frontend/app/pages:/app/pages
 
+  line-api-back:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    image: line-api-backend
+    container_name: line-api-backend
+    restart: always
+    ports:
+      - 19251:19251
+    volumes:
+      - ./backend/app:/app
+    environment:
+      MONGO_BASE_URL: mongodb://${BASE_URL}:19253
+      MONGO_ID: ${MONGO_ID}
+      MONGO_PW: ${MONGO_PW}
+
+  LINE-API-mongoDB:
+    image: mongo
+    container_name: line-api-mongoDB
+    restart: always
+    volumes:
+      - ./data/db:/data/db
+      - ./data/configdb:/data/configdb
+    ports:
+      - 19253:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ID}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PW}
+
+  LINE-API-mongo-express:
+    image: mongo-express
+    container_name: line-api-mongo-express
+    restart: always
+    ports:
+      - 19254:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ID}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PW}
+      ME_CONFIG_MONGODB_SERVER: LINE-API-mongoDB
+    depends_on:
+      - LINE-API-mongoDB
